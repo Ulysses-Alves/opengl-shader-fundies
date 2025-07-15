@@ -34,7 +34,7 @@ Shader createShader(const char* vertexPath, const char* fragmentPath){
         exit(EXIT_FAILURE);
     }
 
-    char* buffer = NULL;
+    char* buffer = nullptr;
 
 
 

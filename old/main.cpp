@@ -1,10 +1,11 @@
-#include <GL/glew.h>
+#include <GL/glew.h> // glew should include opendl headers, therefore must be first
 #include <GLFW/glfw3.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stddef.h>
+#include <iostream>
+#include <cstdlib>
+#include <cstddef>
+#include <Eigen/Dense>
 
-#include "linmath.h"
+using namespace std;
 
 const char* vertexShaderSource = "#version 420 core\n"
     "layout (location = 0) in vec3 aPos;\n"
@@ -59,7 +60,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height){
     glViewport(0,0,width, height);
 }
 
-int main(void){
+int main() {
 
     glfwSetErrorCallback(error_callback);
 
@@ -67,12 +68,11 @@ int main(void){
         exit(EXIT_FAILURE);
     }
 
-    //what is the lowest version I need?
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(640,480, "Title", NULL,NULL);
+    GLFWwindow* window = glfwCreateWindow(640,480, "Title", nullptr, nullptr);
     if(!window){
         glfwTerminate();
         exit(EXIT_FAILURE);
@@ -90,17 +90,17 @@ int main(void){
     
 
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
     glCompileShader(vertexShader);
     glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
 
     if(!success){
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+        glGetShaderInfoLog(vertexShader, 512, nullptr, infoLog);
         printf("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n%s\n", infoLog);
     }
 
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr);
     glCompileShader(fragmentShader);
 
     shaderProgram = glCreateProgram();
@@ -110,7 +110,7 @@ int main(void){
 
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
     if(!success){
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
         printf("ERROR::SHADER::LINKING::COMPILATION_FAILED\n%s\n", infoLog);
     }
 
