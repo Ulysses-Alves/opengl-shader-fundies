@@ -11,6 +11,13 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 void processInput(GLFWwindow* window);
 
+const char *vertexShaderSource = "#version 330 core\n"
+    "layout (location = 0) in vec3 aPos;\n"
+    "void main()\n"
+    "{\n"
+    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+    "}\0";
+
 int main(){
 
     // initialize glfw
@@ -49,6 +56,17 @@ int main(){
 
     // first two args set the location of the lower left corner of the window
     glViewport(0, 0, 800, 600);
+
+    unsigned int vertexShader;
+
+    //creates empty shader returns ID for use
+    vertexShader = glCreateShader(GL_VERTEX_SHADER); 
+    
+    // first arg is where the source will be compiled to, the second the numOfStrings in source, the third is the source code itself
+    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL); 
+
+    //compiles the shader    
+    glCompileShader(vertexShader);
 
     // the render loop
     while(!glfwWindowShouldClose(window)){
