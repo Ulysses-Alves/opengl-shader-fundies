@@ -1,14 +1,15 @@
-#include <GL/glew.h> // glew should include opendl headers, therefore must be first
+#include <GL/glew.h> // glew should include opengl headers, therefore must be first
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <cstdlib>
 #include <cstddef>
 #include <Eigen/Dense>
 
+// remember this -lGLEW -lglfw -lGL -I/usr/include/eigen3
+
 using namespace std;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-
 void processInput(GLFWwindow* window);
 
 const char *vertexShaderSource = "#version 330 core\n"
@@ -17,6 +18,24 @@ const char *vertexShaderSource = "#version 330 core\n"
     "{\n"
     "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
     "}\0";
+
+const char *fragmentShaderSource = "#version 330 core\n"
+    "out vec4 FragColor;\n"
+    "void main()\n"
+    "{\n"
+    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+    "}\0";
+
+unsigned int vertexShader, fragmentShader, shaderProgram;
+unsigned int VBO, VAO;
+
+float vertices[] = {
+    -0.5f, -0.5f, 0.0f,
+    0.5f, -0.5f, 0.0f,
+    0.0f, 0.5f, 0.0f
+};
+
+
 
 int main(){
 
@@ -57,16 +76,43 @@ int main(){
     // first two args set the location of the lower left corner of the window
     glViewport(0, 0, 800, 600);
 
-    unsigned int vertexShader;
+    // ===---=== 
 
     //creates empty shader returns ID for use
     vertexShader = glCreateShader(GL_VERTEX_SHADER); 
-    
     // first arg is where the source will be compiled to, the second the numOfStrings in source, the third is the source code itself
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL); 
-
     //compiles the shader    
     glCompileShader(vertexShader);
+
+
+    //Same as Vertex, but fragments :p
+    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    glCompileShader(fragmentShader);
+
+    shaderProgram = glCreateProgram();
+
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+    glLinkProgram(shaderProgram);
+
+    // check for failure
+
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+
+    glGenBuffers(1, &VBO);
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), ((void*)0));
+    glEnableVertexAttribArray(0);
+
+    glBindVertexArray(0);
 
     // the render loop
     while(!glfwWindowShouldClose(window)){
@@ -75,9 +121,13 @@ int main(){
 
         // sets a color for after using glClear
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        glUseProgram(shaderProgram);
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
 
         // glClear clears the buffer we want
-        glClear(GL_COLOR_BUFFER_BIT);
 
         glfwPollEvents();
         glfwSwapBuffers(window);
